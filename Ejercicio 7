@@ -1,0 +1,230 @@
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <iomanip>
+
+struct Publicacion {
+	int codigo;
+	std::string titulo;
+	int añoPublicacion;
+	std::string estado;
+	std::string tipo; 
+};
+
+const int MAX_PUBLICACIONES = 100;
+
+void registrarPublicacion(Publicacion publicaciones[], int& numPub, const std::string& tipo) {
+	if (numPub >= MAX_PUBLICACIONES) {
+		std::cout << "Máximo de publicaciones alcanzado\n";
+		return;
+	}
+	
+	Publicacion p;
+	std::cout << "Código: "; std::cin >> p.codigo;
+	std::cout << "Título: "; std::cin.ignore(); std::getline(std::cin, p.titulo);
+	std::cout << "Año de publicación: "; std::cin >> p.añoPublicacion;
+	p.estado = "No Prestado";
+	p.tipo = tipo;
+	
+	publicaciones[numPub] = p;
+	numPub++;
+
+	std::ofstream archivo("temp.dat", std::ios::binary | std::ios::app);
+	archivo.write(reinterpret_cast<const char*>(&p), sizeof(Publicacion));
+	archivo.close();
+	
+	std::cout << "Publicación registrada\n";
+}
+
+void prestarPublicacion(Publicacion publicaciones[], int numPub, int codigo) {
+	for (int i = 0; i < numPub; i++) {
+		if (publicaciones[i].codigo == codigo) {
+			if (publicaciones[i].estado == "No Prestado") {
+				publicaciones[i].estado = "Prestado";
+				std::cout << "Publicación prestada exitosamente\n";
+			} else {
+				std::cout << "La publicación ya está prestada\n";
+			}
+			return;
+		}
+	}
+	std::cout << "Publicación no encontrada\n";
+}
+
+void devolverPublicacion(Publicacion publicaciones[], int numPub, int codigo) {
+	for (int i = 0; i < numPub; i++) {
+		if (publicaciones[i].codigo == codigo) {
+			if (publicaciones[i].estado == "Prestado") {
+				publicaciones[i].estado = "No Prestado";
+				std::cout << "Publicación devuelta exitosamente\n";
+			} else {
+				std::cout << "La publicación no está prestada\n";
+			}
+			return;
+		}
+	}
+	std::cout << "Publicación no encontrada\n";
+}
+
+void mostrarPublicacion(const Publicacion& p) {
+	std::cout << std::left << std::setw(5) << p.codigo 
+	<< std::setw(30) << p.titulo 
+	<< std::setw(6) << p.añoPublicacion
+	<< std::setw(12) << p.estado 
+	<< p.tipo << std::endl;
+}
+
+void mostrarTodas(const Publicacion publicaciones[], int numPub) {
+	std::cout << "\n=== TODAS LAS PUBLICACIONES ===\n";
+	std::cout << std::left << std::setw(5) << "CÓD" 
+	<< std::setw(30) << "TÍTULO" 
+	<< std::setw(6) << "AÑO"
+	<< std::setw(12) << "ESTADO" 
+	<< "TIPO" << std::endl;
+	std::cout << std::string(55, '-') << std::endl;
+	
+	for (int i = 0; i < numPub; i++) {
+		mostrarPublicacion(publicaciones[i]);
+	}
+}
+
+void mostrarPrestadas(const Publicacion publicaciones[], int numPub) {
+	std::cout << "\n=== PUBLICACIONES PRESTADAS ===\n";
+	bool hayPrestadas = false;
+	
+	for (int i = 0; i < numPub; i++) {
+		if (publicaciones[i].estado == "Prestado") {
+			mostrarPublicacion(publicaciones[i]);
+			hayPrestadas = true;
+		}
+	}
+	
+	if (!hayPrestadas) {
+		std::cout << "No hay publicaciones prestadas\n";
+	}
+}
+
+void mostrarStock(const Publicacion publicaciones[], int numPub) {
+	std::cout << "\n=== PUBLICACIONES EN STOCK ===\n";
+	bool hayStock = false;
+	
+	for (int i = 0; i < numPub; i++) {
+		if (publicaciones[i].estado == "No Prestado") {
+			mostrarPublicacion(publicaciones[i]);
+			hayStock = true;
+		}
+	}
+	
+	if (!hayStock) {
+		std::cout << "No hay publicaciones en stock\n";
+	}
+}
+
+void guardarPrestados(const Publicacion publicaciones[], int numPub) {
+	std::ofstream archivo("LibrosPrestados.txt");
+	archivo << "Código,Título,Año,Estado\n";
+	
+	for (int i = 0; i < numPub; i++) {
+		if (publicaciones[i].estado == "Prestado") {
+			archivo << publicaciones[i].codigo << ","
+			<< publicaciones[i].titulo << ","
+			<< publicaciones[i].añoPublicacion << ","
+			<< publicaciones[i].estado << "\n";
+		}
+	}
+	archivo.close();
+	std::cout << "Archivo LibrosPrestados.txt generado\n";
+}
+
+void guardarStock(const Publicacion publicaciones[], int numPub) {
+	std::ofstream archivo("LibrosEnStock.txt");
+	archivo << "Código,Título,Año,Estado\n";
+	
+	for (int i = 0; i < numPub; i++) {
+		if (publicaciones[i].estado == "No Prestado") {
+			archivo << publicaciones[i].codigo << ","
+			<< publicaciones[i].titulo << ","
+			<< publicaciones[i].añoPublicacion << ","
+			<< publicaciones[i].estado << "\n";
+		}
+	}
+	archivo.close();
+	std::cout << "Archivo LibrosEnStock.txt generado\n";
+}
+
+void cargarPublicaciones(Publicacion publicaciones[], int& numPub) {
+	std::ifstream archivo("temp.dat", std::ios::binary);
+	numPub = 0;
+	
+	while (archivo.read(reinterpret_cast<char*>(&publicaciones[numPub]), sizeof(Publicacion)) && 
+		   numPub < MAX_PUBLICACIONES) {
+		numPub++;
+	}
+	archivo.close();
+}
+
+int main() {
+	Publicacion publicaciones[MAX_PUBLICACIONES];
+	int numPub = 0;
+	
+	std::cout << "=== SISTEMA GESTIÓN BIBLIOTECA ===\n";
+
+	cargarPublicaciones(publicaciones, numPub);
+	
+	int opcion;
+	do {
+		std::cout << "\n=== MENÚ PRINCIPAL ===\n";
+		std::cout << "1. Registrar Libro\n";
+		std::cout << "2. Registrar Revista\n";
+		std::cout << "3. Prestar publicación\n";
+		std::cout << "4. Devolver publicación\n";
+		std::cout << "5. Mostrar todas las publicaciones\n";
+		std::cout << "6. Mostrar prestadas\n";
+		std::cout << "7. Mostrar en stock\n";
+		std::cout << "0. Generar archivos y salir\n";
+		std::cout << "Opción: ";
+		std::cin >> opcion;
+		
+		switch(opcion) {
+			case 1: 
+			registrarPublicacion(publicaciones, numPub, "Libro");
+			break;
+			case 2: 
+			registrarPublicacion(publicaciones, numPub, "Revista");
+			break;
+			case 3: {
+				int codigo;
+				std::cout << "Código a prestar: ";
+				std::cin >> codigo;
+				prestarPublicacion(publicaciones, numPub, codigo);
+				break;
+			}
+			case 4: {
+				int codigo;
+				std::cout << "Código a devolver: ";
+				std::cin >> codigo;
+				devolverPublicacion(publicaciones, numPub, codigo);
+				break;
+			}
+			case 5: 
+			mostrarTodas(publicaciones, numPub);
+			break;
+			case 6: 
+			mostrarPrestadas(publicaciones, numPub);
+			break;
+			case 7: 
+			mostrarStock(publicaciones, numPub);
+			break;
+			case 0: 
+			std::cout << "Generando archivos...\n";
+			guardarPrestados(publicaciones, numPub);
+			guardarStock(publicaciones, numPub);
+			std::cout << "¡Gracias por usar el sistema de biblioteca!\n";
+			break;
+			default: 
+			std::cout << "Opción inválida\n";
+		}
+	} while (opcion != 0);
+	
+	return 0;
+}
