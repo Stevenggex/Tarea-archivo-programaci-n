@@ -1,0 +1,42 @@
+#include <iostream>
+#include <fstream>
+using namespace std;
+
+int main() {
+    int k;
+    int arreglo[100];
+    int n;
+    
+    cout << "Ingrese el valor de k: ";
+    cin >> k;
+    
+    cout << "Ingrese cantidad de elementos: ";
+    cin >> n;
+    
+    cout << "Ingrese los " << n << " elementos:\n";
+    for (int i = 0; i < n; i++) {
+        cin >> arreglo[i];
+    }
+    
+    ofstream archivo("producto_escalar.txt");
+    archivo << "k = " << k << "\n";
+    archivo << "Arreglo = [";
+    for (int i = 0; i < n; i++) {
+        archivo << arreglo[i];
+        if (i < n-1) archivo << ", ";
+    }
+    archivo << "]\n";
+    
+    archivo << "Producto escalar = [";
+    for (int i = 0; i < n; i++) {
+        int resultado = k * arreglo[i];
+        archivo << resultado;
+        if (i < n-1) archivo << ", ";
+    }
+    archivo << "]\n";
+    
+    archivo.close();
+    cout << "Resultado guardado en producto_escalar.txt\n";
+    
+    return 0;
+}
