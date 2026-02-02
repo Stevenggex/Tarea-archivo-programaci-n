@@ -1,0 +1,88 @@
+#include <iostream>
+#include <fstream>
+#include <cstring>
+#include <iomanip>   
+using namespace std;
+
+struct Helado {
+    int codigo;
+    char sabor[50];
+    float precio;
+};
+
+int main() {
+    Helado ventas[10];
+    float suma_total = 0.0;
+    float precio_min = 999999.99;
+    int indice_min = -1;
+    int indice_mora = -1;
+
+    ofstream archivo_escritura("helados.txt");
+    if (!archivo_escritura.is_open()) {
+        cout << "Error al crear el archivo helados.txt\n";
+        return 1;
+    }
+
+    cout << "Ingrese los datos de 10 ventas de helados:\n\n";
+
+    for (int i = 0; i < 10; i++) {
+        cout << "Venta #" << (i+1) << ":\n";
+        cout << "  Codigo: ";
+        cin >> ventas[i].codigo;
+        cout << "  Sabor: ";
+        cin.ignore();
+        cin.getline(ventas[i].sabor, 50);
+        cout << "  Precio: ";
+        cin >> ventas[i].precio;
+
+        archivo_escritura << ventas[i].codigo << "|"
+                          << ventas[i].sabor << "|"
+                          << fixed << setprecision(2) << ventas[i].precio << "\n";
+
+        suma_total += ventas[i].precio;
+        if (ventas[i].precio < precio_min) {
+            precio_min = ventas[i].precio;
+            indice_min = i;
+        }
+        if (strcmp(ventas[i].sabor, "mora") == 0) {
+            indice_mora = i;
+        }
+    }
+    archivo_escritura.close();
+    cout << "\nDatos guardados en helados.txt\n";
+
+    ifstream archivo_lectura("helados.txt");
+    if (!archivo_lectura.is_open()) {
+        cout << "Error al abrir helados.txt para lectura\n";
+        return 1;
+    }
+
+    cout << "\n=== Lectura del archivo helados.txt ===\n";
+    string linea;
+    int contador = 0;
+    while (getline(archivo_lectura, linea) && contador < 10) {
+        cout << "Linea " << (contador+1) << ": " << linea << "\n";
+        contador++;
+    }
+    archivo_lectura.close();
+
+    cout << "\n=== RESULTADOS ===\n";
+
+    cout << "Helado con el precio MAS BAJO:\n";
+    cout << "  Codigo: " << ventas[indice_min].codigo << "\n";
+    cout << "  Sabor:  " << ventas[indice_min].sabor << "\n";
+    cout << "  Precio: $" << fixed << setprecision(2) << ventas[indice_min].precio << "\n\n";
+
+    if (indice_mora != -1) {
+        cout << "Helado de sabor MORA:\n";
+        cout << "  Codigo: " << ventas[indice_mora].codigo << "\n";
+        cout << "  Precio: $" << fixed << setprecision(2) << ventas[indice_mora].precio << "\n\n";
+    } else {
+        cout << "No se registro ningun helado de sabor mora.\n\n";
+    }
+
+    cout << "Suma total de los precios de todos los helados: $"
+         << fixed << setprecision(2) << suma_total << "\n";
+
+    return 0;
+}
