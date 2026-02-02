@@ -1,0 +1,55 @@
+#include <iostream>
+#include <fstream>
+using namespace std;
+
+int main() {
+	char detalle[5];
+	int cantidad;
+	float valor_unitario, total_item, subtotal = 0, iva, total_pagar;
+	
+	ofstream archivo("factura.txt");
+	if (!archivo.is_open()) {
+		cout << "Error al crear el archivo\n";
+		return 1;
+	}
+	
+	cout << "Ingrese datos de la factura (0 para terminar)\n\n";
+	
+	archivo << "CANTIDAD    DETALLE                  VALOR UNIT.    TOTAL\n";
+	archivo << "------------------------------------------------------------\n";
+	
+	while (true) {
+		cout << "Cantidad: ";
+		cin >> cantidad;
+		if (cantidad == 0) break;
+		
+		cout << "Detalle: ";
+		cin.ignore();
+		cin.getline(detalle, 100);
+		
+		cout << "Valor unitario: ";
+		cin >> valor_unitario;
+		
+		cout<<"------------------------------------------------------------\n";
+		
+		total_item = cantidad * valor_unitario;
+		subtotal += total_item;
+		
+		archivo << cantidad << "           " 
+		<< detalle << "               " 
+		<< valor_unitario << "           " 
+		<< total_item << "\n";
+	}
+	
+	iva = subtotal * 0.12;
+	total_pagar = subtotal + iva;
+	
+	archivo << "------------------------------------------------------------\n";
+	archivo << "Subtotal:                           " << subtotal << "\n";
+	archivo << "IVA 12%:                            " << iva << "\n";
+	archivo << "TOTAL A PAGAR:                      " << total_pagar << "\n";
+	
+	archivo.close();
+	cout << "\nFactura guardada en factura.txt\n";
+	
+	return 0;
