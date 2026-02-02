@@ -6,18 +6,20 @@
 #include <sstream>
 #include <ctime>
 
+using namespace std;
+
 struct Cliente {
 	int codigo;
-	std::string nombre;
-	std::string tipoServicio;
+	string nombre;
+	string tipoServicio;
 	int añoAfiliacion;
-	std::string estado;
+	string estado;
 	int codigoPlan;
 };
 
 struct Plan {
 	int codigo;
-	std::string nombre;
+	string nombre;
 	int velocidadMinutos;
 	double precioMensual;
 };
@@ -27,30 +29,30 @@ const int MAX_PLANES = 10;
 
 void crearCliente(Cliente clientes[], int& numClientes) {
 	if (numClientes >= MAX_CLIENTES) {
-		std::cout << "Máximo de clientes alcanzado\n";
+		cout << "Máximo de clientes alcanzado\n";
 		return;
 	}
 	
 	Cliente c;
-	std::cout << "Código: "; std::cin >> c.codigo;
-	std::cout << "Nombre: "; std::cin.ignore(); std::getline(std::cin, c.nombre);
-	std::cout << "Tipo (Internet/Telefonía/Combo): "; std::cin >> c.tipoServicio;
-	std::cout << "Año afiliación: "; std::cin >> c.añoAfiliacion;
-	std::cout << "Estado (Activo/Suspendido): "; std::cin >> c.estado;
-	std::cout << "Código plan: "; std::cin >> c.codigoPlan;
+	cout << "Código: "; cin >> c.codigo;
+	cout << "Nombre: "; cin.ignore(); getline(cin, c.nombre);
+	cout << "Tipo (Internet/Telefonía/Combo): "; cin >> c.tipoServicio;
+	cout << "Año afiliación: "; cin >> c.añoAfiliacion;
+	cout << "Estado (Activo/Suspendido): "; cin >> c.estado;
+	cout << "Código plan: "; cin >> c.codigoPlan;
 	
 	clientes[numClientes] = c;
 	numClientes++;
 	
-	std::ofstream archivo("clientes.dat", std::ios::binary | std::ios::app);
+	ofstream archivo("clientes.dat", ios::binary | ios::app);
 	archivo.write(reinterpret_cast<char*>(&c), sizeof(Cliente));
 	archivo.close();
 	
-	std::cout << "Cliente creado\n";
+	cout << "Cliente creado\n";
 }
 
 void leerClientes(Cliente clientes[], int& numClientes) {
-	std::ifstream archivo("clientes.dat", std::ios::binary);
+	ifstream archivo("clientes.dat", ios::binary);
 	numClientes = 0;
 	
 	while (archivo.read(reinterpret_cast<char*>(&clientes[numClientes]), sizeof(Cliente)) && numClientes < MAX_CLIENTES) {
@@ -60,34 +62,34 @@ void leerClientes(Cliente clientes[], int& numClientes) {
 }
 
 void mostrarClientes(const Cliente clientes[], int numClientes) {
-	std::cout << "\n=== LISTADO DE CLIENTES ===\n";
+	cout << "\n=== LISTADO DE CLIENTES ===\n";
 	for (int i = 0; i < numClientes; i++) {
-		std::cout << "Cód: " << clientes[i].codigo << " | " 
+		cout << "Cód: " << clientes[i].codigo << " | " 
 		<< clientes[i].nombre << " | " 
 		<< clientes[i].tipoServicio << " | " 
-		<< clientes[i].estado << " | Plan: " << clientes[i].codigoPlan << std::endl;
+		<< clientes[i].estado << " | Plan: " << clientes[i].codigoPlan << endl;
 	}
 }
 
 void actualizarEstadoCliente(Cliente clientes[], int numClientes) {
 	int codigo;
-	std::cout << "Código cliente: "; std::cin >> codigo;
+	cout << "Código cliente: "; cin >> codigo;
 	
 	for (int i = 0; i < numClientes; i++) {
 		if (clientes[i].codigo == codigo) {
-			std::cout << "Nuevo estado (Activo/Suspendido): "; 
-			std::cin >> clientes[i].estado;
+			cout << "Nuevo estado (Activo/Suspendido): "; 
+			cin >> clientes[i].estado;
 			
-			std::ofstream archivo("clientes.dat", std::ios::binary);
+			ofstream archivo("clientes.dat", ios::binary);
 			for (int j = 0; j < numClientes; j++) {
 				archivo.write(reinterpret_cast<char*>(&clientes[j]), sizeof(Cliente));
 			}
 			archivo.close();
-			std::cout << "Estado actualizado\n";
+			cout << "Estado actualizado\n";
 			return;
 		}
 	}
-	std::cout << "Cliente no encontrado\n";
+	cout << "Cliente no encontrado\n";
 }
 
 void eliminarCliente(Cliente clientes[], int& numClientes, int codigo) {
@@ -98,37 +100,37 @@ void eliminarCliente(Cliente clientes[], int& numClientes, int codigo) {
 			}
 			numClientes--;
 			
-			std::ofstream archivo("clientes.dat", std::ios::binary);
+			ofstream archivo("clientes.dat", ios::binary);
 			for (int k = 0; k < numClientes; k++) {
 				archivo.write(reinterpret_cast<char*>(&clientes[k]), sizeof(Cliente));
 			}
 			archivo.close();
-			std::cout << "Cliente eliminado\n";
+			cout << "Cliente eliminado\n";
 			return;
 		}
 	}
-	std::cout << "Cliente no encontrado\n";
+	cout << "Cliente no encontrado\n";
 }
 
 void buscarPorCodigo(const Cliente clientes[], int numClientes, int codigo) {
 	for (int i = 0; i < numClientes; i++) {
 		if (clientes[i].codigo == codigo) {
-			std::cout << "Cliente: " << clientes[i].nombre 
+			cout << "Cliente: " << clientes[i].nombre 
 			<< " - Estado: " << clientes[i].estado 
-			<< " - Servicio: " << clientes[i].tipoServicio << std::endl;
+			<< " - Servicio: " << clientes[i].tipoServicio << endl;
 			return;
 		}
 	}
-	std::cout << "No encontrado\n";
+	cout << "No encontrado\n";
 }
 
 void leerPlanes(Plan planes[], int& numPlanes) {
-	std::ifstream archivo("planes.txt");
+	ifstream archivo("planes.txt");
 	numPlanes = 0;
 	
 	if (!archivo) {
-		std::cout << "Archivo planes.txt no encontrado, creando datos de ejemplo...\n";
-		std::ofstream crear("planes.txt");
+		cout << "Archivo planes.txt no encontrado, creando datos de ejemplo...\n";
+		ofstream crear("planes.txt");
 		crear << "1 Internet_Básico 50 25.99\n";
 		crear << "2 Internet_Premium 100 45.99\n";
 		crear << "3 Telefonía 1000 15.99\n";
@@ -137,9 +139,9 @@ void leerPlanes(Plan planes[], int& numPlanes) {
 		archivo.open("planes.txt");
 	}
 	
-	std::string linea;
-	while (std::getline(archivo, linea) && numPlanes < MAX_PLANES) {
-		std::istringstream iss(linea);
+	string linea;
+	while (getline(archivo, linea) && numPlanes < MAX_PLANES) {
+		istringstream iss(linea);
 		iss >> planes[numPlanes].codigo >> planes[numPlanes].nombre 
 		>> planes[numPlanes].velocidadMinutos >> planes[numPlanes].precioMensual;
 		numPlanes++;
@@ -148,12 +150,12 @@ void leerPlanes(Plan planes[], int& numPlanes) {
 }
 
 void mostrarPlanes(const Plan planes[], int numPlanes) {
-	std::cout << "\n=== PLANES DISPONIBLES ===\n";
+	cout << "\n=== PLANES DISPONIBLES ===\n";
 	for (int i = 0; i < numPlanes; i++) {
-		std::cout << "Cód: " << planes[i].codigo << " | " 
+		cout << "Cód: " << planes[i].codigo << " | " 
 		<< planes[i].nombre << " | " 
 		<< planes[i].velocidadMinutos << "Mbps/Min | $" 
-		<< std::fixed << std::setprecision(2) << planes[i].precioMensual << std::endl;
+		<< fixed << setprecision(2) << planes[i].precioMensual << endl;
 	}
 }
 
@@ -173,7 +175,7 @@ double calcularTotalFacturado(const Cliente clientes[], int numClientes, const P
 }
 
 void generarFacturacion(const Cliente clientes[], int numClientes, const Plan planes[], int numPlanes) {
-	std::ofstream archivo("facturacion.csv");
+	ofstream archivo("facturacion.csv");
 	archivo << "Código,Nombre,Precio,Total\n";
 	
 	for (int i = 0; i < numClientes; i++) {
@@ -188,7 +190,7 @@ void generarFacturacion(const Cliente clientes[], int numClientes, const Plan pl
 		}
 	}
 	archivo.close();
-	std::cout << "Facturación generada en facturacion.csv\n";
+	cout << "Facturación generada en facturacion.csv\n";
 }
 
 int main() {
@@ -196,25 +198,25 @@ int main() {
 	Plan planes[MAX_PLANES];
 	int numClientes = 0, numPlanes = 0;
 	
-	std::cout << "=== SISTEMA GESTIÓN EMPRESA TELEFONÍA ===\n";
+	cout << "=== SISTEMA GESTIÓN EMPRESA TELEFONÍA ===\n";
 	
 	leerClientes(clientes, numClientes);
 	leerPlanes(planes, numPlanes);
 	
 	int opcion;
 	do {
-		std::cout << "\n=== MENÚ PRINCIPAL ===\n";
-		std::cout << "1. Crear cliente\n";
-		std::cout << "2. Mostrar clientes\n";
-		std::cout << "3. Mostrar planes\n";
-		std::cout << "4. Actualizar estado cliente\n";
-		std::cout << "5. Eliminar cliente\n";
-		std::cout << "6. Buscar cliente por código\n";
-		std::cout << "7. Generar facturación\n";
-		std::cout << "8. Total facturado\n";
-		std::cout << "0. Salir\n";
-		std::cout << "Opción: ";
-		std::cin >> opcion;
+		cout << "\n=== MENÚ PRINCIPAL ===\n";
+		cout << "1. Crear cliente\n";
+		cout << "2. Mostrar clientes\n";
+		cout << "3. Mostrar planes\n";
+		cout << "4. Actualizar estado cliente\n";
+		cout << "5. Eliminar cliente\n";
+		cout << "6. Buscar cliente por código\n";
+		cout << "7. Generar facturación\n";
+		cout << "8. Total facturado\n";
+		cout << "0. Salir\n";
+		cout << "Opción: ";
+		cin >> opcion;
 		
 		switch(opcion) {
 			case 1: crearCliente(clientes, numClientes); break;
@@ -222,24 +224,24 @@ int main() {
 			case 3: mostrarPlanes(planes, numPlanes); break;
 			case 4: actualizarEstadoCliente(clientes, numClientes); break;
 			case 5: {
-				int cod; std::cout << "Código a eliminar: "; std::cin >> cod;
+				int cod; cout << "Código a eliminar: "; cin >> cod;
 				eliminarCliente(clientes, numClientes, cod);
 				break;
 			}
 			case 6: {
-				int cod; std::cout << "Código a buscar: "; std::cin >> cod;
+				int cod; cout << "Código a buscar: "; cin >> cod;
 				buscarPorCodigo(clientes, numClientes, cod);
 				break;
 			}
 			case 7: generarFacturacion(clientes, numClientes, planes, numPlanes); break;
 			case 8: {
 				double total = calcularTotalFacturado(clientes, numClientes, planes, numPlanes);
-				std::cout << "Total facturado mensual: $" 
-				<< std::fixed << std::setprecision(2) << total << std::endl;
+				cout << "Total facturado mensual: $" 
+				<< fixed << setprecision(2) << total << endl;
 				break;
 			}
-			case 0: std::cout << "¡Gracias por usar el sistema!\n"; break;
-			default: std::cout << "Opción inválida\n";
+			case 0: cout << "¡Gracias por usar el sistema!\n"; break;
+			default: cout << "Opción inválida\n";
 		}
 	} while (opcion != 0);
 	
