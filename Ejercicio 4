@@ -1,0 +1,76 @@
+#include <iostream>
+#include <fstream>
+#include <cstring>
+using namespace std;
+
+struct Publicacion {
+    char codigo[20];
+    char titulo[100];
+    int anio;
+    bool prestado; 
+};
+
+void guardarArchivos(Publicacion pubs[], int n) {
+    ofstream stock("LibrosEnStock.txt");
+    ofstream prestados("LibrosPrestados.txt");
+    
+    for (int i = 0; i < n; i++) {
+        if (pubs[i].prestado) {
+            prestados << pubs[i].codigo << " | " 
+                      << pubs[i].titulo << " | " 
+                      << pubs[i].anio << " | Prestado\n";
+        } else {
+            stock << pubs[i].codigo << " | " 
+                  << pubs[i].titulo << " | " 
+                  << pubs[i].anio << " | En stock\n";
+        }
+    }
+    stock.close();
+    prestados.close();
+}
+
+int main() {
+    Publicacion pubs[100];
+    int n = 0;
+    char opc;
+    
+    do {
+        cout << "\n1. Agregar publicación   2. Prestar   3. Devolver   4. Salir\n";
+        cout << "Opcion: "; cin >> opc;
+        
+        if (opc == '1') {
+            cout << "Codigo: ";    cin >> pubs[n].codigo;
+            cout << "Titulo: ";    cin.ignore(); cin.getline(pubs[n].titulo, 100);
+            cout << "Año: ";       cin >> pubs[n].anio;
+            pubs[n].prestado = false;
+            n++;
+        }
+        else if (opc == '2') {
+            char cod[20];
+            cout << "Codigo a prestar: "; cin >> cod;
+            for (int i = 0; i < n; i++) {
+                if (strcmp(pubs[i].codigo, cod) == 0) {
+                    pubs[i].prestado = true;
+                    cout << "Prestado\n";
+                    break;
+                }
+            }
+        }
+        else if (opc == '3') {
+            char cod[20];
+            cout << "Codigo a devolver: "; cin >> cod;
+            for (int i = 0; i < n; i++) {
+                if (strcmp(pubs[i].codigo, cod) == 0) {
+                    pubs[i].prestado = false;
+                    cout << "Devuelto\n";
+                    break;
+                }
+            }
+        }
+        
+        guardarArchivos(pubs, n);
+        
+    } while (opc != '4');
+    
+    return 0;
+}
